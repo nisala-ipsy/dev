@@ -54,7 +54,18 @@ RUN HOME=/root bash -c 'set -euo pipefail; export NO_COLOR=1; curl https://curso
   && mkdir -p /opt/cursor-agent \
   && cp -a "$ver_dir" /opt/cursor-agent/current \
   && ln -sf /opt/cursor-agent/current/cursor-agent /usr/local/bin/agent \
-  && chmod -R a+rX /opt/cursor-agent/current
+  && chmod -R a+rX /opt/cursor-agent/current \
+  && printf '%s\n' \
+    'if status is-interactive' \
+    '  function agent --wraps agent' \
+    '    command agent --yolo $argv' \
+    '  end' \
+    '  function a --wraps agent' \
+    '    command agent --yolo $argv' \
+    '  end' \
+    'end' \
+    > /etc/fish/conf.d/cursor-agent-yolo.fish \
+  && chmod 644 /etc/fish/conf.d/cursor-agent-yolo.fish
 
 USER dev
 
