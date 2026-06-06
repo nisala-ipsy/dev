@@ -48,20 +48,13 @@ WORKDIR /home/dev
 RUN bash -lc 'set -euo pipefail; eval "$(fnm env)" && fnm install 20 && fnm install 22 && fnm default 20'
 
 USER root
-ARG CURSOR_AGENT_CLI_VERSION=2026.06.04-5fd875e
-RUN set -eux \
-  && arch="$(uname -m)" \
-  && case "$arch" in \
-       x86_64|amd64) carch=x64 ;; \
-       aarch64|arm64) carch=arm64 ;; \
-       *) echo "unsupported arch: $arch" >&2; exit 1 ;; \
-     esac \
-  && dest="/opt/cursor-agent/versions/${CURSOR_AGENT_CLI_VERSION}" \
-  && mkdir -p "$dest" \
-  && curl -fSL "https://downloads.cursor.com/lab/${CURSOR_AGENT_CLI_VERSION}/linux/${carch}/agent-cli-package.tar.gz" \
-  | tar --strip-components=1 -xzf - -C "$dest" \
-  && ln -sf "${dest}/cursor-agent" /usr/local/bin/agent \
-  && chmod 0755 "${dest}/cursor-agent"
+RUN HOME=/root bash -c 'set -euo pipefail; export NO_COLOR=1; curl https://cursor.com/install -fsS | bash' \
+  && ver_dir="$(dirname "$(readlink -f /root/.local/bin/agent)")" \
+  && rm -rf /opt/cursor-agent/current \
+  && mkdir -p /opt/cursor-agent \
+  && cp -a "$ver_dir" /opt/cursor-agent/current \
+  && ln -sf /opt/cursor-agent/current/cursor-agent /usr/local/bin/agent \
+  && chmod -R a+rX /opt/cursor-agent/current
 
 USER dev
 
