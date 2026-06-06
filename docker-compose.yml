@@ -1,0 +1,17 @@
+services:
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    image: dev-ubuntu-pi:latest
+    container_name: dev
+    user: "${UID:-1000}:${GID:-1000}"
+    working_dir: /home/dev
+    volumes:
+      - ./home:/home/dev
+    stdin_open: true
+    tty: true
+    restart: unless-stopped

@@ -1,0 +1,36 @@
+name: Docker verify
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - Dockerfile
+      - docker-compose.yml
+      - .github/scripts/verify-docker-container.sh
+      - .github/workflows/docker-verify.yml
+  pull_request:
+    paths:
+      - Dockerfile
+      - docker-compose.yml
+      - .github/scripts/verify-docker-container.sh
+      - .github/workflows/docker-verify.yml
+  workflow_dispatch: {}
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ensure bind-mount directory exists
+        run: mkdir -p home
+
+      - name: Build image
+        run: docker compose build
+
+      - name: Run checks inside container
+        run: |
+          docker compose run --rm -T \
+            -v "${GITHUB_WORKSPACE}:/ci:ro" \
+            dev \
+            bash -lc 'bash /ci/.github/scripts/verify-docker-container.sh'
