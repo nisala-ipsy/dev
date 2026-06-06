@@ -1,4 +1,4 @@
-# Ubuntu LTS — dev shell w/ fish, git, ripgrep, fd, Pi coding agent
+# Ubuntu LTS — dev shell w/ fish, git, ripgrep, fd, Cursor CLI (agent)
 FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -45,15 +45,27 @@ RUN apt-get update \
 USER dev
 WORKDIR /home/dev
 
-RUN bash -lc 'eval "$(fnm env)" && fnm install 20 && fnm install 22 && fnm default 20 && fnm exec --using=22 npm install -g --ignore-scripts @earendil-works/pi-coding-agent'
+RUN bash -lc 'set -euo pipefail; eval "$(fnm env)" && fnm install 20 && fnm install 22 && fnm default 20'
 
 USER root
-RUN printf '%s\n' \
-    '#!/bin/sh' \
-    'export FNM_DIR=/opt/fnm-node' \
-    'exec /usr/local/bin/fnm exec --using=22 pi "$@"' \
-    > /usr/local/bin/pi \
-  && chmod 0755 /usr/local/bin/pi
+RUN HOME=/root bash -c 'set -euo pipefail; export NO_COLOR=1; curl https://cursor.com/install -fsS | bash' \
+  && ver_dir="$(dirname "$(readlink -f /root/.local/bin/agent)")" \
+  && rm -rf /opt/cursor-agent/current \
+  && mkdir -p /opt/cursor-agent \
+  && cp -a "$ver_dir" /opt/cursor-agent/current \
+  && ln -sf /opt/cursor-agent/current/cursor-agent /usr/local/bin/agent \
+  && chmod -R a+rX /opt/cursor-agent/current \
+  && printf '%s\n' \
+    'if status is-interactive' \
+    '  function agent --wraps agent' \
+    '    command agent --yolo $argv' \
+    '  end' \
+    '  function a --wraps agent' \
+    '    command agent --yolo $argv' \
+    '  end' \
+    'end' \
+    > /etc/fish/conf.d/cursor-agent-yolo.fish \
+  && chmod 644 /etc/fish/conf.d/cursor-agent-yolo.fish
 
 USER dev
 

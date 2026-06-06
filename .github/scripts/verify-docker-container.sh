@@ -17,7 +17,7 @@ need_cmd fd
 need_cmd fnm
 need_cmd node
 need_cmd npm
-need_cmd pi
+need_cmd agent
 
 git --version >/dev/null || fail "git --version failed"
 rg --version >/dev/null || fail "rg --version failed"
@@ -52,12 +52,6 @@ case "$def" in
   *) fail "fnm default should be v20.x, got ${def}" ;;
 esac
 
-if pi --help >/dev/null 2>&1; then
-  :
-elif pi -h >/dev/null 2>&1; then
-  :
-else
-  fail "pi --help (or -h) failed"
-fi
+agent --version >/dev/null || fail "agent --version failed"
 
 echo "OK — binaries + Node ${default_node} (default), ${n20}, ${n22}, fnm default ${def}"
