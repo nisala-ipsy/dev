@@ -23,7 +23,9 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Ensure bind-mount directory exists
-        run: mkdir -p home
+        run: |
+          mkdir -p home
+          sudo chown -R 1000:1000 home
 
       - name: Build image
         run: docker compose build
