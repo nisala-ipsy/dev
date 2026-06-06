@@ -1,4 +1,4 @@
-# Ubuntu LTS — dev shell w/ fish, git, ripgrep, fd, Cursor CLI (agent)
+# Ubuntu LTS — dev shell w/ fish, git, ripgrep, fd, Neovim, Starship, zoxide, Cursor CLI (agent)
 FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -18,8 +18,10 @@ RUN apt-get update \
     git \
     ripgrep \
     fd-find \
+    neovim \
     sudo \
     unzip \
+    zoxide \
   && ln -sf /usr/bin/fdfind /usr/local/bin/fd \
   && curl -fsSL https://fnm.vercel.app/install | bash -s -- --install-dir /opt/fnm-bin --skip-shell \
   && ln -sf /opt/fnm-bin/fnm /usr/local/bin/fnm \
@@ -39,6 +41,12 @@ RUN apt-get update \
     'eval "$(fnm env --shell bash)"' \
     > /etc/profile.d/fnm.sh \
   && chmod 644 /etc/profile.d/fnm.sh \
+  && curl -sS https://starship.rs/install.sh | sh -s -- -y -b /usr/local/bin \
+  && zoxide init fish > /etc/fish/conf.d/zoxide.fish \
+  && starship init fish > /etc/fish/conf.d/99-starship.fish \
+  && zoxide init bash > /etc/profile.d/zoxide.sh \
+  && starship init bash > /etc/profile.d/starship.sh \
+  && chmod 644 /etc/fish/conf.d/zoxide.fish /etc/fish/conf.d/99-starship.fish /etc/profile.d/zoxide.sh /etc/profile.d/starship.sh \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
