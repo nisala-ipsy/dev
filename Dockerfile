@@ -1,4 +1,4 @@
-# Ubuntu LTS — dev shell w/ fish, git, ripgrep, fd, Pi coding agent
+# Ubuntu LTS — dev shell w/ fish, git, ripgrep, fd, Cursor CLI (agent)
 FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -45,15 +45,23 @@ RUN apt-get update \
 USER dev
 WORKDIR /home/dev
 
-RUN bash -lc 'eval "$(fnm env)" && fnm install 20 && fnm install 22 && fnm default 20 && fnm exec --using=22 npm install -g --ignore-scripts @earendil-works/pi-coding-agent'
+RUN bash -lc 'set -euo pipefail; eval "$(fnm env)" && fnm install 20 && fnm install 22 && fnm default 20'
 
 USER root
-RUN printf '%s\n' \
-    '#!/bin/sh' \
-    'export FNM_DIR=/opt/fnm-node' \
-    'exec /usr/local/bin/fnm exec --using=22 pi "$@"' \
-    > /usr/local/bin/pi \
-  && chmod 0755 /usr/local/bin/pi
+ARG CURSOR_AGENT_CLI_VERSION=2026.06.04-5fd875e
+RUN set -eux \
+  && arch="$(uname -m)" \
+  && case "$arch" in \
+       x86_64|amd64) carch=x64 ;; \
+       aarch64|arm64) carch=arm64 ;; \
+       *) echo "unsupported arch: $arch" >&2; exit 1 ;; \
+     esac \
+  && dest="/opt/cursor-agent/versions/${CURSOR_AGENT_CLI_VERSION}" \
+  && mkdir -p "$dest" \
+  && curl -fSL "https://downloads.cursor.com/lab/${CURSOR_AGENT_CLI_VERSION}/linux/${carch}/agent-cli-package.tar.gz" \
+  | tar --strip-components=1 -xzf - -C "$dest" \
+  && ln -sf "${dest}/cursor-agent" /usr/local/bin/agent \
+  && chmod 0755 "${dest}/cursor-agent"
 
 USER dev
 
