@@ -28,7 +28,7 @@ RUN apt-get update \
     zoxide \
   && ln -sf /usr/bin/fdfind /usr/local/bin/fd \
   && curl -fsSL --retry 3 --retry-delay 5 -o /tmp/fnm.zip \
-    https://github.com/Schniz/fnm/releases/latest/download/fnm-linux.zip \
+    https://github.com/Schniz/fnm/releases/download/v1.39.0/fnm-linux.zip \
   && unzip -o /tmp/fnm.zip -d /opt/fnm-bin \
   && chmod +x /opt/fnm-bin/fnm \
   && rm /tmp/fnm.zip \
@@ -53,7 +53,7 @@ RUN apt-get update \
     > /etc/profile.d/fnm.sh \
   && chmod 644 /etc/profile.d/fnm.sh \
   && curl -fsSL --retry 3 --retry-delay 5 -o /tmp/starship.tar.gz \
-    https://github.com/starship/starship/releases/latest/download/starship-x86_64-unknown-linux-gnu.tar.gz \
+    https://github.com/starship/starship/releases/download/v1.25.1/starship-x86_64-unknown-linux-gnu.tar.gz \
   && tar -xzf /tmp/starship.tar.gz -C /usr/local/bin starship \
   && chmod +x /usr/local/bin/starship \
   && rm /tmp/starship.tar.gz \
