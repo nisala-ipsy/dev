@@ -1,4 +1,4 @@
-# Ubuntu LTS — dev shell w/ fish, git, ripgrep, fd, Neovim, Starship, zoxide, Cursor CLI (agent)
+# Ubuntu LTS — dev shell w/ fish, git, gh, ripgrep, fd, Neovim, Starship, zoxide, Cursor CLI (agent)
 FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -15,6 +15,7 @@ RUN apt-get update \
     ca-certificates \
     curl \
     fish \
+    gh \
     git \
     ripgrep \
     fd-find \
