@@ -33,6 +33,9 @@ RUN apt-get update \
   && if getent passwd "${UID}" >/dev/null; then userdel -r "$(getent passwd "${UID}" | cut -d: -f1)" 2>/dev/null || true; fi \
   && if ! getent group "${GID}" >/dev/null; then groupadd --gid "${GID}" dev; fi \
   && useradd --uid "${UID}" --gid "${GID}" --shell /usr/bin/fish --create-home dev \
+  && echo 'dev ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/dev \
+  && chmod 0440 /etc/sudoers.d/dev \
+  && mkdir -p /var/run/sshd \
   && chown -R dev:dev "${FNM_DIR}" \
   && printf '%s\n' \
     'set -gx FNM_DIR /opt/fnm-node' \
@@ -86,6 +89,6 @@ RUN chmod 0755 /usr/local/bin/docker-entrypoint.sh
 
 EXPOSE 22
 
-USER root
+USER dev
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["sleep", "infinity"]
