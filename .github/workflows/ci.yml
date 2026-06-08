@@ -62,7 +62,7 @@ jobs:
         run: docker compose build
 
       - name: Scan image with Trivy
-        uses: aquasecurity/trivy-action@0.36.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: dev-ubuntu-cursor:latest
           format: table
