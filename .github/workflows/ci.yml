@@ -18,10 +18,8 @@ jobs:
           dockerfile: Dockerfile
 
       - name: Lint shell scripts with shellcheck
-        uses: ludeeus/action-shellcheck@2.0.0
-        with:
-          scandir: .
-          ignore_paths: home
+        run: |
+          find . -path ./home -prune -o -name '*.sh' -print0 | xargs -0 shellcheck
 
       - name: Validate docker-compose.yml
         run: docker compose config --quiet
