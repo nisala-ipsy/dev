@@ -18,6 +18,9 @@ need_cmd fnm
 need_cmd node
 need_cmd npm
 need_cmd agent
+need_cmd nvim
+need_cmd starship
+need_cmd zoxide
 
 git --version >/dev/null || fail "git --version failed"
 rg --version >/dev/null || fail "rg --version failed"
@@ -53,5 +56,8 @@ case "$def" in
 esac
 
 agent --version >/dev/null || fail "agent --version failed"
+nvim --version >/dev/null || fail "nvim --version failed"
+starship --version >/dev/null || fail "starship --version failed"
+zoxide --version >/dev/null || fail "zoxide --version failed"
 
 echo "OK — binaries + Node ${default_node} (default), ${n20}, ${n22}, fnm default ${def}"
