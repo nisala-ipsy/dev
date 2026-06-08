@@ -8,8 +8,6 @@ services:
         GID: ${GID:-1000}
     image: dev-ubuntu-cursor:latest
     container_name: dev
-    ports:
-      - "127.0.0.1:2222:22"
     working_dir: /home/dev
     volumes:
       - ./home:/home/dev
