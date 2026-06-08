@@ -1,4 +1,3 @@
 ignored:
   - DL3008  # apt pin versions — dev container always wants latest
-  - DL3002  # last USER root — entrypoint needs root for sshd
   - SC2016  # single quotes intentional — writing literal fish/bash config
