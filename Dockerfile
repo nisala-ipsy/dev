@@ -1,6 +1,8 @@
 # Ubuntu LTS — dev shell w/ fish, git, gh, ripgrep, fd, Neovim, Starship, zoxide, Cursor CLI (agent)
 FROM ubuntu:24.04
 
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 ENV DEBIAN_FRONTEND=noninteractive \
     LANG=C.UTF-8 \
     LC_ALL=C.UTF-8 \
