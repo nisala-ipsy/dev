@@ -19,6 +19,7 @@ RUN apt-get update \
     ripgrep \
     fd-find \
     neovim \
+    openssh-server \
     sudo \
     unzip \
     zoxide \
@@ -47,6 +48,8 @@ RUN apt-get update \
   && zoxide init bash > /etc/profile.d/zoxide.sh \
   && starship init bash > /etc/profile.d/starship.sh \
   && chmod 644 /etc/fish/conf.d/zoxide.fish /etc/fish/conf.d/99-starship.fish /etc/profile.d/zoxide.sh /etc/profile.d/starship.sh \
+  && sed -i 's/^#*PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config \
+  && sed -i 's/^#*PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
@@ -75,6 +78,11 @@ RUN HOME=/root bash -c 'set -euo pipefail; export NO_COLOR=1; curl https://curso
     > /etc/fish/conf.d/cursor-agent-yolo.fish \
   && chmod 644 /etc/fish/conf.d/cursor-agent-yolo.fish
 
-USER dev
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod 0755 /usr/local/bin/docker-entrypoint.sh
 
+EXPOSE 22
+
+USER root
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["sleep", "infinity"]

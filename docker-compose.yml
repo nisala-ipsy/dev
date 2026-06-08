@@ -8,7 +8,6 @@ services:
         GID: ${GID:-1000}
     image: dev-ubuntu-cursor:latest
     container_name: dev
-    user: "${UID:-1000}:${GID:-1000}"
     working_dir: /home/dev
     volumes:
       - ./home:/home/dev
