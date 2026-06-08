@@ -27,7 +27,11 @@ RUN apt-get update \
     unzip \
     zoxide \
   && ln -sf /usr/bin/fdfind /usr/local/bin/fd \
-  && curl -fsSL https://fnm.vercel.app/install | bash -s -- --install-dir /opt/fnm-bin --skip-shell \
+  && curl -fsSL --retry 3 --retry-delay 5 -o /tmp/fnm.zip \
+    https://github.com/Schniz/fnm/releases/latest/download/fnm-linux.zip \
+  && unzip -o /tmp/fnm.zip -d /opt/fnm-bin \
+  && chmod +x /opt/fnm-bin/fnm \
+  && rm /tmp/fnm.zip \
   && ln -sf /opt/fnm-bin/fnm /usr/local/bin/fnm \
   && mkdir -p "${FNM_DIR}" \
   && if getent passwd "${UID}" >/dev/null; then userdel -r "$(getent passwd "${UID}" | cut -d: -f1)" 2>/dev/null || true; fi \
@@ -48,7 +52,11 @@ RUN apt-get update \
     'eval "$(fnm env --shell bash)"' \
     > /etc/profile.d/fnm.sh \
   && chmod 644 /etc/profile.d/fnm.sh \
-  && curl -sS https://starship.rs/install.sh | sh -s -- -y -b /usr/local/bin \
+  && curl -fsSL --retry 3 --retry-delay 5 -o /tmp/starship.tar.gz \
+    https://github.com/starship/starship/releases/latest/download/starship-x86_64-unknown-linux-gnu.tar.gz \
+  && tar -xzf /tmp/starship.tar.gz -C /usr/local/bin starship \
+  && chmod +x /usr/local/bin/starship \
+  && rm /tmp/starship.tar.gz \
   && zoxide init fish > /etc/fish/conf.d/zoxide.fish \
   && starship init fish > /etc/fish/conf.d/99-starship.fish \
   && zoxide init bash > /etc/profile.d/zoxide.sh \
