@@ -1,3 +1,7 @@
 # Keep `home/` for Docker/bind mounts; only `.gitkeep` is tracked.
 home/*
 !home/.gitkeep
+
+# Pre-downloaded release assets for Docker build
+.dl/*
+!.dl/.gitkeep

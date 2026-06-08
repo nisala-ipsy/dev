@@ -37,6 +37,14 @@ jobs:
           mkdir -p home
           sudo chown -R 1000:1000 home
 
+      - name: Pre-download release assets
+        run: |
+          mkdir -p .dl
+          gh release download v1.39.0 --repo Schniz/fnm --pattern 'fnm-linux.zip' --output .dl/fnm.zip
+          gh release download v1.25.1 --repo starship/starship --pattern 'starship-x86_64-unknown-linux-gnu.tar.gz' --output .dl/starship.tar.gz
+        env:
+          GH_TOKEN: ${{ github.token }}
+
       - name: Build image
         run: docker compose build
 
@@ -57,6 +65,14 @@ jobs:
         run: |
           mkdir -p home
           sudo chown -R 1000:1000 home
+
+      - name: Pre-download release assets
+        run: |
+          mkdir -p .dl
+          gh release download v1.39.0 --repo Schniz/fnm --pattern 'fnm-linux.zip' --output .dl/fnm.zip
+          gh release download v1.25.1 --repo starship/starship --pattern 'starship-x86_64-unknown-linux-gnu.tar.gz' --output .dl/starship.tar.gz
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: Build image
         run: docker compose build

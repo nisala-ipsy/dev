@@ -1,4 +1,26 @@
 # Ubuntu LTS — dev shell w/ fish, git, gh, ripgrep, fd, Neovim, Starship, zoxide, Cursor CLI (agent)
+
+# --- download stage: fetch release binaries (CI pre-populates .dl/) ---
+FROM ubuntu:24.04 AS dl
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl unzip \
+  && rm -rf /var/lib/apt/lists/*
+COPY .dl/ /pre/
+ARG FNM_VERSION=v1.39.0
+ARG STARSHIP_VERSION=v1.25.1
+RUN if [ ! -s /pre/fnm.zip ]; then \
+      curl -fsSL --retry 3 --retry-delay 5 -o /pre/fnm.zip \
+        "https://github.com/Schniz/fnm/releases/download/${FNM_VERSION}/fnm-linux.zip"; \
+    fi \
+  && if [ ! -s /pre/starship.tar.gz ]; then \
+      curl -fsSL --retry 3 --retry-delay 5 -o /pre/starship.tar.gz \
+        "https://github.com/starship/starship/releases/download/${STARSHIP_VERSION}/starship-x86_64-unknown-linux-gnu.tar.gz"; \
+    fi \
+  && mkdir -p /out/fnm /out/starship \
+  && unzip -o /pre/fnm.zip -d /out/fnm \
+  && tar -xzf /pre/starship.tar.gz -C /out/starship
+
+# --- main image ---
 FROM ubuntu:24.04
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
@@ -10,6 +32,9 @@ ENV DEBIAN_FRONTEND=noninteractive \
 
 ARG UID=1000
 ARG GID=1000
+
+COPY --from=dl /out/fnm/fnm /opt/fnm-bin/fnm
+COPY --from=dl /out/starship/starship /usr/local/bin/starship
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
@@ -27,11 +52,7 @@ RUN apt-get update \
     unzip \
     zoxide \
   && ln -sf /usr/bin/fdfind /usr/local/bin/fd \
-  && curl -fsSL --retry 3 --retry-delay 5 -o /tmp/fnm.zip \
-    https://github.com/Schniz/fnm/releases/download/v1.39.0/fnm-linux.zip \
-  && unzip -o /tmp/fnm.zip -d /opt/fnm-bin \
-  && chmod +x /opt/fnm-bin/fnm \
-  && rm /tmp/fnm.zip \
+  && chmod +x /opt/fnm-bin/fnm /usr/local/bin/starship \
   && ln -sf /opt/fnm-bin/fnm /usr/local/bin/fnm \
   && mkdir -p "${FNM_DIR}" \
   && if getent passwd "${UID}" >/dev/null; then userdel -r "$(getent passwd "${UID}" | cut -d: -f1)" 2>/dev/null || true; fi \
@@ -52,11 +73,6 @@ RUN apt-get update \
     'eval "$(fnm env --shell bash)"' \
     > /etc/profile.d/fnm.sh \
   && chmod 644 /etc/profile.d/fnm.sh \
-  && curl -fsSL --retry 3 --retry-delay 5 -o /tmp/starship.tar.gz \
-    https://github.com/starship/starship/releases/download/v1.25.1/starship-x86_64-unknown-linux-gnu.tar.gz \
-  && tar -xzf /tmp/starship.tar.gz -C /usr/local/bin starship \
-  && chmod +x /usr/local/bin/starship \
-  && rm /tmp/starship.tar.gz \
   && zoxide init fish > /etc/fish/conf.d/zoxide.fish \
   && starship init fish > /etc/fish/conf.d/99-starship.fish \
   && zoxide init bash > /etc/profile.d/zoxide.sh \
